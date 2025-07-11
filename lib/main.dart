@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tv_mac_app/pages/get_ip_address.dart';
-import 'package:tv_mac_app/pages/main_page.dart';
 
 
 void main() {
@@ -14,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TOLCLIN-TV',
+      title: 'TOLCLIN CONNECT TV',
       debugShowCheckedModeBanner: false,  
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

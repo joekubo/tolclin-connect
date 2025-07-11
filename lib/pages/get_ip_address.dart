@@ -20,7 +20,7 @@ class _GetIpState extends State<GetIp> {
   void _loadImageAfterDelay() {
     Timer(Duration(seconds: 7), () {
       setState(() {
-        _isImageReady = true; // Change state to show the image after 5 seconds.
+        _isImageReady = true;
       });
     });
   }
@@ -36,6 +36,8 @@ class _GetIpState extends State<GetIp> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.blueGrey[50],
       appBar: AppBar(
@@ -60,12 +62,46 @@ class _GetIpState extends State<GetIp> {
         ],
       ),
       body: _isImageReady
-          ? Center(
-              child: QrImageView(
-                data: "$_ipAddress",
-                version: QrVersions.auto,
-                size: 200,
-              ),
+          ? Column(
+              children: [
+                SizedBox(height: height / 4),
+                Center(
+                  child: QrImageView(
+                    data: "$_ipAddress",
+                    version: QrVersions.auto,
+                    size: 200,
+                  ),
+                ),
+                const SizedBox(height: 5.0),
+                Center(
+                  child: Column(
+                    children: [
+                      Center(
+                        child: CustomText(
+                          text: "SCAN TO CONNECT",
+                          weight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5.0),
+                      Center(
+                        child: LoadingAnimationWidget.beat(
+                          color: Colors.grey,
+                          size: 30,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // : CustomText(text: "Connected ... "),
+                SizedBox(height: height / 5),
+                Center(
+                  child: CustomText(
+                    text: "Always Remember - JESUS loves you!",
+                    color: Colors.red,
+                  ),
+                ),
+                const SizedBox(height: 10),
+              ],
             )
           : Center(
               child: LoadingAnimationWidget.stretchedDots(

@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:tv_mac_app/components/custom_text.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
