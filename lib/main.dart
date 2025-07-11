@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tv_mac_app/pages/get_ip_address.dart';
 import 'package:tv_mac_app/pages/main_page.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: const MainPage(),
+      home: const GetIp(),
     );
   }
 }

@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:network_info_plus/network_info_plus.dart';
-import 'package:tv_mac_app/components/barcode.dart';
 import 'package:tv_mac_app/components/custom_text.dart';
-import 'package:barcode/barcode.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -16,16 +14,15 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  String? _ipAddress;
-  bool _isImageReady = false;
-
+  // String? _ipAddress;
+  // bool _isImageReady = false;
   @override
   void initState() {
     super.initState();
-    setState(() {
-      _getIPAddress(context);
-      _loadImageAfterDelay();
-    });
+    // setState(() {
+    //   _getIPAddress(context);
+    //   _loadImageAfterDelay();
+    // });
   }
 
   @override
@@ -36,12 +33,13 @@ class _MainPageState extends State<MainPage> {
   void _loadImageAfterDelay() {
     Timer(Duration(seconds: 7), () {
       setState(() {
-        _isImageReady = true; // Change state to show the image after 5 seconds.
+        // _isImageReady = true; // Change state to show the image after 5 seconds.
       });
     });
   }
 
-  Future<void> _getIPAddress(context) async {
+
+  _getIPAddress(context) async {
     final networkInfo = NetworkInfo();
     String? wifiIP;
     try {
@@ -50,23 +48,13 @@ class _MainPageState extends State<MainPage> {
       SnackBar snackBar = SnackBar(content: Text(e.toString()));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
-
     setState(() {
-      _ipAddress = wifiIP;
-      buildBarcode(
-        height: 200,
-        Barcode.dataMatrix(),
-
-        "$_ipAddress",
-        filename: 'barcode',
-      );
+      // _ipAddress = wifiIP;
     });
   }
 
-  Widget svg = SvgPicture.asset("assets/barcode.svg");
-
   @override
-  Widget build(BuildContext context) {
+  build(BuildContext context) async {
     return Scaffold(
       backgroundColor: Colors.blueGrey[50],
       appBar: AppBar(
@@ -83,18 +71,21 @@ class _MainPageState extends State<MainPage> {
             icon: const Icon(Icons.refresh, color: Colors.white, size: 30),
             onPressed: () {
               setState(() {
-                _getIPAddress(context);
-                _loadImageAfterDelay();
+                // _getIPAddress(context);
+                // _loadImageAfterDelay();
               });
             },
           ),
         ],
       ),
-      body: _isImageReady
-          ? Center(child: svg)
-          : Center(
-              child: LoadingAnimationWidget.stretchedDots(color: Colors.blueGrey, size: 50),
-            ),
+      // body: _isImageReady
+      //     ? Center(child: Text("Hello World"))
+      //     : Center(
+      //         child: LoadingAnimationWidget.stretchedDots(
+      //           color: Colors.blueGrey,
+      //           size: 50,
+      //         ),
+      //       ),
     );
   }
 }
