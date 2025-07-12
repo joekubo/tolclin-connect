@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/ai_barcode_scanner.dart';
 import 'package:mobile/components/buttons.dart';
 import 'package:mobile/components/custom_text.dart';
+import 'package:mobile/pages/scanning2.dart';
 
 class Scanning extends StatefulWidget {
   const Scanning({super.key});
@@ -86,7 +87,8 @@ class _ScanningState extends State<Scanning> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => AiBarcodeScanner( controller: scannerController,),
+                              // builder: (context) => AiBarcodeScanner( controller: scannerController,),
+                              builder: (context) => Scanning2(),
                             ),
                           );
                         });
