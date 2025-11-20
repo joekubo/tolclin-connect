@@ -1,115 +1,156 @@
-import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:mobile/ai_barcode_scanner.dart';
-import 'package:mobile/components/buttons.dart';
-import 'package:mobile/components/custom_text.dart';
-import 'package:mobile/pages/scanning2.dart';
+import 'package:flutter/services.dart';
+import 'package:mac_address_plus/mac_address_plus.dart';
+import 'package:mobile/functions/functions.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:audioplayers/audioplayers.dart';
 
-class Scanning extends StatefulWidget {
-  const Scanning({super.key});
+class QrScannerPage extends StatefulWidget {
+  const QrScannerPage({super.key});
 
   @override
-  State<Scanning> createState() => _ScanningState();
+  State<QrScannerPage> createState() => _QrScannerPageState();
 }
 
-class _ScanningState extends State<Scanning> {
-  MobileScannerController scannerController = MobileScannerController();
+class _QrScannerPageState extends State<QrScannerPage> {
+  final MobileScannerController controller = MobileScannerController();
+  final AudioPlayer player = AudioPlayer();
+
+  bool _scanned = false;
+  String scannedValue = "";
+
+  String _macAddress = 'Unknown';
+
+  final _macAddressPlusPlugin = MacAddressPlus();
+
+  Future<void> initPlatformState() async {
+    String macAddress;
+    try {
+      macAddress =
+          await _macAddressPlusPlugin.getMacAddress() ?? 'Unknown mac address';
+    } on PlatformException {
+      macAddress = 'Failed to get mac address.';
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _macAddress = macAddress;
+      print(macAddress);
+    });
+  }
+
+  void _loadImageAfterDelay() {
+    Timer(Duration(seconds: 4), () {
+      setState(() {
+        SystemNavigator.pop();
+      });
+    });
+  }
+
+  @override
+  void initState() {
+    initPlatformState();
+    // _getIPAddress(context);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    player.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        backgroundColor: Colors.deepOrange,
-        title: CustomText(
-          text: 'TOLCLIN CONNECT',
-          size: 12,
-          color: Colors.white,
-          weight: FontWeight.bold,
-        ),
-        centerTitle: true,
+        title: const Text("QR Scanner"),
+        backgroundColor: Colors.black,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.flash_on, color: Colors.white),
+            onPressed: () => controller.toggleTorch(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.cameraswitch, color: Colors.white),
+            onPressed: () => controller.switchCamera(),
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              color: Colors.black,
-              elevation: 20.0,
-              shadowColor: Colors.blueAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5.0),
+      body: Stack(
+        children: [
+          // CAMERA VIEW
+          MobileScanner(
+            controller: controller,
+            onDetect: (capture) async {
+              if (_scanned) return;
+
+              _scanned = true;
+
+              final barcode = capture.barcodes.first;
+              final String code = barcode.rawValue ?? "Unknown";
+
+              // 🔊 beep sound
+              await player.play(AssetSource('sounds/beep.mp3'));
+
+              // print the QR code to the UI
+              setState(() {
+                scannedValue = code;
+              });
+              await Functions().updateDetails(
+                _macAddress,
+                scannedValue,
+                context,
+              );
+              _loadImageAfterDelay();
+
+              // resume scanning after a short delay, no page freeze
+              await Future.delayed(const Duration(seconds: 2));
+              _scanned = false;
+            },
+          ),
+
+          // OVERLAY (semi-transparent)
+          Container(color: Colors.black.withOpacity(0.3)),
+
+          // SCAN BOX
+          Center(
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.greenAccent, width: 4),
+                borderRadius: BorderRadius.circular(20),
               ),
-              child: ListTile(
-                title: CustomText(
-                  text: "DateTime : 2025-07-11 10:09:45",
-                  size: 10.0,
-                  weight: FontWeight.bold,
+            ),
+          ),
+
+          // DISPLAY SCANNED VALUE (bottom)
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              color: Colors.black.withOpacity(0.5),
+              child: Text(
+                scannedValue.isEmpty
+                    ? "Scan a code..."
+                    : "TV Connected Successfully...",
+                textAlign: TextAlign.center,
+                style: const TextStyle(
                   color: Colors.white,
-                ),
-                subtitle: CustomText(
-                  text: "Amount: KES 20, (T234SDFAFS)",
-                  size: 7.0,
-                  color: Colors.white,
-                ),
-                trailing: PopupMenuButton(itemBuilder: (context) => []),
-              ),
-            ),
-            const SizedBox(height: 40),
-            SizedBox(
-              width: width,
-              child: Card(
-                color: Colors.white,
-                elevation: 20.0,
-                shadowColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                child: Column(
-                  children: [
-                    const SizedBox(height: 10),
-                    SizedBox(width: width * 0.75, child: Divider()),
-                    const SizedBox(height: 10),
-                    CustomText(
-                      text: "SCAN TV QR-CODE",
-                      color: Colors.blue,
-                      size: 18.0,
-                      weight: FontWeight.bold,
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(width: width * 0.75, child: Divider()),
-                    SizedBox(height: height * 0.2),
-                    MyButton(
-                      text: "SCAN",
-                      width: width * 0.9,
-                      onPressed: () {
-                        setState(() {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              // builder: (context) => AiBarcodeScanner( controller: scannerController,),
-                              builder: (context) => Scanning2(),
-                            ),
-                          );
-                        });
-                        print( scannerController);
-                      },
-                      textColor: Colors.red,
-                      height: height * 0.08,
-                      buttonColor: Colors.amber.shade200,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const SizedBox(height: 60),
-            CustomText(
-              text: "Powered by TOLCLIN",
-              color: Colors.amber.shade900,
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
