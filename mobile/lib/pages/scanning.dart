@@ -69,7 +69,7 @@ class _QrScannerPageState extends State<QrScannerPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("QR Scanner"),
+        title: const Text("TOLCLIN CONNECT Scanner"),
         backgroundColor: Colors.black,
         actions: [
           IconButton(
@@ -139,7 +139,7 @@ class _QrScannerPageState extends State<QrScannerPage> {
               color: Colors.black.withOpacity(0.5),
               child: Text(
                 scannedValue.isEmpty
-                    ? "Scan a code..."
+                    ? "Scan TV..."
                     : "TV Connected Successfully...",
                 textAlign: TextAlign.center,
                 style: const TextStyle(

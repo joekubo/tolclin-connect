@@ -9,7 +9,7 @@
 
     <application
         android:hardwareAccelerated="true"
-        android:label="Tolclin Connect Mobile"
+        android:label="TOLCLIN CONNECT MOBILE"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
